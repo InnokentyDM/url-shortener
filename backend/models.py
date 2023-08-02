@@ -20,7 +20,7 @@ class Url(Base):
     id = Column(Integer, primary_key=True, index=True)
     original_url = Column(String)
     short_url = Column(String, unique=True, index=True)
-    count = Column(Integer)
+    count = Column(Integer, default=0)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="urls")
