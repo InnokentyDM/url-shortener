@@ -20,7 +20,3 @@ Implemented
 3) Endpoint for handling redirect
 4) Form for creating a short url
 5) List for displaying previous urls and redirect count
-
-One possible implementation for redirect count for specific ip would be to
-store the counter in redis. 
-Key would be short_url:user_ip and value would count 
