@@ -1,7 +1,6 @@
-import logging
-
 from fastapi import Depends, FastAPI, HTTPException
-from starlette.responses import RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 
 import schemas
 from settings import settings
@@ -11,7 +10,16 @@ from utils import shorten_url
 
 app = FastAPI()
 
-logger = logging.getLogger()
+origins = ['*']
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
+
 
 
 @app.on_event("startup")
@@ -53,6 +61,10 @@ UrlService = Depends(get_url_service)):
         user_id=url.user_id)
     return f'{settings.base_url}/r/{db_short_url.short_url}'
 
+@app.get("/urls")
+def get_urls(url_service: UrlService = Depends(get_url_service)):
+    urls = url_service.get_urls()
+    return urls
 
 @app.delete("/urls/{id}")
 def delete_url(id: int):

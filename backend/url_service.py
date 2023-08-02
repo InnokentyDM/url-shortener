@@ -32,11 +32,16 @@ class UrlService:
 
     def get_short_url(self, short_url: str) -> models.Url:
         db_url = self.db.query(models.Url).filter(models.Url.short_url ==
-                                                 short_url).first()
+                                                  short_url).first()
         db_url.count += 1
         self.db.commit()
         self.db.refresh(db_url)
         return db_url
+
+    def get_urls(self):
+        urls = self.db.query(models.Url).all()
+        return urls
+
 
 def get_url_service(db: Session = Depends(get_db)) -> UrlService:
     url_service = UrlService(db=db)
