@@ -84,7 +84,7 @@ const Urls: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="container">
       <form onSubmit={handleSubmit}>
         <label htmlFor="original_url">Original URL:</label>
         <input
@@ -100,9 +100,9 @@ const Urls: React.FC = () => {
       {submittedData.length > 0 && (
         <div>
           <h2>Previously Created URLs:</h2>
-          <ul>
+          <ul className="list-group">
             {submittedData.map((url) => (
-              <li key={url.id}>
+              <li className="list-group-item" key={url.id}>
                 <p>ID: {url.id}</p>
                 <p>Original URL: {url.original_url}</p>
                 <p>
