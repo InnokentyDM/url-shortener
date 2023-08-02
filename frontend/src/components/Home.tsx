@@ -20,7 +20,7 @@ interface UrlData {
 const Urls: React.FC = () => {
   const [formData, setFormData] = useState<CreateShortUrlRequest>({
     original_url: '',
-    user_id: 1, // Replace with the actual user ID or get it dynamically from the logged-in user
+    user_id: 1, // Hardcoded user id
   });
   const [submittedData, setSubmittedData] = useState<UrlData[]>([]);
 
@@ -62,10 +62,8 @@ const Urls: React.FC = () => {
       const data: CreateShortUrlResponse = await response.json();
       console.log('Short URL created:', data.short_url);
 
-      // Clear the form after successful submission
       setFormData({ original_url: '', user_id: formData.user_id });
 
-      // Fetch the updated list of URLs
       fetchUrls();
     } catch (error) {
       console.error('Error creating short URL:', error);
@@ -78,6 +76,11 @@ const Urls: React.FC = () => {
       ...prevFormData,
       [name]: value,
     }));
+  };
+
+  const openShortUrl = (shortUrl: string) => {
+    window.open(shortUrl, '_blank');
+    fetchUrls();
   };
 
   return (
@@ -102,7 +105,12 @@ const Urls: React.FC = () => {
               <li key={url.id}>
                 <p>ID: {url.id}</p>
                 <p>Original URL: {url.original_url}</p>
-                <p>Short URL: <a href={url.short_url}>{url.short_url}</a></p>
+                <p>
+                  Short URL:{' '}
+                  <a href="#" onClick={() => openShortUrl(url.short_url)}>
+                    {url.short_url}
+                  </a>
+                </p>
                 <p>Count: {url.count}</p>
               </li>
             ))}
