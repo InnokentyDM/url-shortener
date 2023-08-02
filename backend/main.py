@@ -21,7 +21,6 @@ app.add_middleware(
 )
 
 
-
 @app.on_event("startup")
 async def startup_event():
     init_db()
@@ -41,16 +40,6 @@ Depends(get_url_service)):
     return url_service.create_user(user)
 
 
-@app.post("/login")
-def login():
-    pass
-
-
-@app.get("/urls")
-def urls_list():
-    pass
-
-
 @app.post("/urls")
 def create_url(url: schemas.CreateShortUrl, url_service:
 UrlService = Depends(get_url_service)):
@@ -61,14 +50,13 @@ UrlService = Depends(get_url_service)):
         user_id=url.user_id)
     return f'{settings.base_url}/r/{db_short_url.short_url}'
 
+
 @app.get("/urls")
 def get_urls(url_service: UrlService = Depends(get_url_service)):
     urls = url_service.get_urls()
+    for url in urls:
+        url.short_url = f'{settings.base_url}/r/{url.short_url}'
     return urls
-
-@app.delete("/urls/{id}")
-def delete_url(id: int):
-    pass
 
 
 @app.get("/r/{url}")

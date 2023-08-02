@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface CreateShortUrlRequest {
   original_url: string;
@@ -10,17 +10,43 @@ interface CreateShortUrlResponse {
   short_url: string;
 }
 
+interface UrlData {
+  id: number;
+  original_url: string;
+  short_url: string;
+  count: number;
+}
+
 const Urls: React.FC = () => {
   const [formData, setFormData] = useState<CreateShortUrlRequest>({
     original_url: '',
-    user_id: 1, // hardcoded user
+    user_id: 1, // Replace with the actual user ID or get it dynamically from the logged-in user
   });
+  const [submittedData, setSubmittedData] = useState<UrlData[]>([]);
+
+  useEffect(() => {
+    fetchUrls();
+  }, []);
+
+  const fetchUrls = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/urls');
+      if (!response.ok) {
+        console.error('Error fetching URLs:', response.status, response.statusText);
+        return;
+      }
+      const data: UrlData[] = await response.json();
+      setSubmittedData(data);
+    } catch (error) {
+      console.error('Error fetching URLs:', error);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8000/urls', {
+      const response = await fetch('http://127.0.0.1:8000/urls', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +62,11 @@ const Urls: React.FC = () => {
       const data: CreateShortUrlResponse = await response.json();
       console.log('Short URL created:', data.short_url);
 
+      // Clear the form after successful submission
       setFormData({ original_url: '', user_id: formData.user_id });
+
+      // Fetch the updated list of URLs
+      fetchUrls();
     } catch (error) {
       console.error('Error creating short URL:', error);
     }
@@ -51,18 +81,35 @@ const Urls: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="original_url">Original URL:</label>
-      <input
-        type="text"
-        id="original_url"
-        name="original_url"
-        value={formData.original_url}
-        onChange={handleChange}
-        required
-      />
-      <button type="submit">Create Short URL</button>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="original_url">Original URL:</label>
+        <input
+          type="text"
+          id="original_url"
+          name="original_url"
+          value={formData.original_url}
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">Create Short URL</button>
+      </form>
+      {submittedData.length > 0 && (
+        <div>
+          <h2>Previously Created URLs:</h2>
+          <ul>
+            {submittedData.map((url) => (
+              <li key={url.id}>
+                <p>ID: {url.id}</p>
+                <p>Original URL: {url.original_url}</p>
+                <p>Short URL: <a href={url.short_url}>{url.short_url}</a></p>
+                <p>Count: {url.count}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 };
 
